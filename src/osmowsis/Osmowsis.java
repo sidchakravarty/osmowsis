@@ -6,20 +6,19 @@
  */
 package osmowsis;
 
-import com.sun.org.apache.bcel.internal.generic.InstructionConstants;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.InputMismatchException;
-import java.util.Iterator;
 import java.util.Scanner;
 
 public class Osmowsis {
     // VARIABLES //
     private static ArrayList<String> strInstructions = new ArrayList();
     private static Lawn lawn;
+    private static Mower mower;
     /**
      * ALGORITHM:
      * 1. Read CSV file stored in current directory
@@ -31,6 +30,10 @@ public class Osmowsis {
     public static void main(String[] args) {
         // Look up contents of current folder
         lookupFiles();
+        addDecorations("Mower");
+        addDecorations("Crater");
+        lawn.addGrass();
+        printLawn(lawn.getIntLawnWidth(), lawn.getIntLawnHeight());
     }
     
     /**
@@ -104,6 +107,7 @@ public class Osmowsis {
             getLawnDimensions();
         } catch (Exception e) {
             System.err.println("Error loading input file contents: " + e.getMessage());
+            System.exit(0);
         }
     }
     
@@ -129,9 +133,7 @@ public class Osmowsis {
             System.err.println("Height: " + intLawnHeight);
         } else {
             //String strLawn[][] = new String[intLawnWidth][intLawnHeight];
-            lawn = new Lawn(intLawnWidth, intLawnHeight);
-            printLawn(intLawnHeight, intLawnWidth);            
-            
+            lawn = new Lawn(intLawnWidth + 2, intLawnHeight + 2);
         }
 
         
@@ -146,7 +148,8 @@ public class Osmowsis {
         
         for (int intH = 0; intH < intLawnHeight; intH++) {
             for (int intW = 0; intW < intLawnWidth; intW++) {
-                System.out.print("|  ");
+                System.out.print(" | ");
+                System.out.print(lawn.whatsOnTheLawn(intW, intH));
             }
             System.out.println("|");
         }
@@ -165,6 +168,95 @@ public class Osmowsis {
             strTemp = strTemp.substring(1);
             strTemp = String.valueOf(strTemp.charAt(0));
             System.out.println(strTemp);
+        return strTemp;
+    }
+
+    /**
+     * OBJECTIVE: Add Craters and Mowers to the lawn
+     * @param strDecoration 
+     */
+    private static void addDecorations(String strDecoration) {
+        int intMowerX;
+        int intMowerY;
+        int intCraterX;
+        int intCraterY;
+        String strMowerDirection; 
+        int numberOfCraters = 0;
+        switch (strDecoration) {
+            
+            case "Mower":
+                intMowerX = mowerXY (strInstructions.get(3), "Width");
+                intMowerY = mowerXY (strInstructions.get(3), "Height");
+                strMowerDirection = mowerDirection (strInstructions.get(3));
+                mower = new Mower(intMowerX + 1, intMowerY + 1, "Active", strMowerDirection);
+                lawn.addMower(intMowerX + 1, intMowerY + 1);
+                break;
+                
+            case "Crater":
+                numberOfCraters = Integer.parseInt(retrieveDimension(strInstructions.get(4)));
+                if(numberOfCraters > 0) {
+                    for (int i = 0; i < numberOfCraters; i++) {
+                        //System.out.println("Crater: " + strInstructions.get(i+5));
+                        intCraterX = CraterXY (strInstructions.get(i+5), "X");
+                        intCraterY = CraterXY (strInstructions.get(i+5), "Y");
+                        lawn.addCrater(intCraterX, intCraterY);
+                    }                    
+                }
+                break;
+        }
+    }
+    
+    private static int CraterXY(String strValue, String strDim) {
+        int intValue = 0;
+        String strTemp = "";      
+        try {
+            if (strDim.contains("X")) {
+                strTemp = strValue.trim();
+                strTemp = strTemp.substring(1, strTemp.indexOf(","));
+            } else if (strDim.contains("Y")) {
+                strTemp = strValue.trim();
+                int start = strTemp.indexOf(",") + 1;
+                strTemp = strTemp.substring(start);
+                strTemp = strTemp.substring(0,strTemp.length() - 1);
+                strTemp = strTemp.trim();
+            }
+        } catch (Exception e) {
+            System.err.println("Error Parsing Mower Location: " + e.getMessage());
+            System.exit(0);
+        }
+        intValue = Integer.parseInt(strTemp);
+        return intValue;        
+        
+    }
+    
+    private static int mowerXY(String strValue, String strDim) {
+        int intValue = 0;
+        String strTemp = "";
+        try {
+            if (strDim.contains("Width")) {
+                strTemp = strValue.trim();
+                strTemp = strTemp.substring(1, strTemp.indexOf(","));
+            } else if (strDim.contains("Height")) {
+                strTemp = strValue.trim();
+                int start = strTemp.indexOf(",") + 1;
+                strTemp = strTemp.substring(start);
+                strTemp = strTemp.substring(1, strTemp.indexOf(","));
+            }
+        } catch (Exception e) {
+            System.err.println("Error Parsing Mower Location: " + e.getMessage());
+            System.exit(0);
+        }
+        intValue = Integer.parseInt(strTemp);
+        return intValue;
+    }
+
+    private static String mowerDirection(String strValue) {
+        String strTemp = "";
+        strTemp = strValue.trim();
+        int start = strTemp.indexOf(",") + 1;
+        strTemp = strTemp.substring(start);
+        start = strTemp.indexOf(",") + 1;
+        strTemp = strTemp.substring(start);
         return strTemp;
     }
 }

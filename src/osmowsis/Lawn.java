@@ -30,21 +30,47 @@ public class Lawn {
                     addFence(i,j);
                 } else if (j == 0) {
                     addFence(i,j);
-                } else if (i == intLawnWidth) {
+                } else if (i == intLawnWidth - 1) {
                     addFence(i,j);
-                } else if (j == intLawnHeight) {
+                } else if (j == intLawnHeight - 1) {
                     addFence(i,j);                    
                 }
             }
         }
     }
     
-    public void addCrater(int intX, int intY){
-        strLawn[intX][intY] = "Crater";
-    }
+    private void addFence(int intX, int intY) {strLawn[intX][intY] = "fence";}
+    public void addCrater(int intX, int intY){strLawn[intX][intY] = "crater";}
+    public void addMower(int intX, int intY){strLawn[intX][intY] = "mower";}    
+    public void cutGrass(int intX, int intY) {strLawn[intX][intY] = "empty";}
     
-    private void addFence(int intX, int intY) {
-        strLawn[intX][intY] = "Fence";
-    }
+    public void addGrass() {
+        for (int i = 1; i < intLawnWidth-1; i++) {
+            for (int j = 1; j < intLawnHeight-1; j++) {
+                try {
+                    if (strLawn[i][j].contains("") || strLawn[i][j].isEmpty()) {
+                        strLawn[i][j] = "grass";
+                    }
+                } catch (Exception e) { // Null Pointer Exception
+                    strLawn[i][j] = "grass";                    
+                }
+            }
+        }
+    }    
+
+    public int getIntLawnWidth() {return intLawnWidth;}
+    public int getIntLawnHeight() {return intLawnHeight;}
     
+    public String whatsOnTheLawn(int intX, int intY) {
+        if (strLawn[intX][intY].contains("fence")) {
+            return "fence";
+        } else if (strLawn[intX][intY].contains("crater")) {
+            return "crater";
+        } else if (strLawn[intX][intY].contains("mower")) {
+            return "mower";
+        } else if (strLawn[intX][intY].contains("grass")) {
+            return "grass";
+        }
+        return "";
+    }
 }
