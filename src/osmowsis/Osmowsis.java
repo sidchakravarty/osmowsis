@@ -336,10 +336,231 @@ public class Osmowsis extends Move{
     }
 
     @Override
-    public void determineDirection() {
+    public void determineAvailableDirection(String strN, String strNE, String strE, 
+    String strSE, String strS, String strSW, String strW, String strNW) {
+        boolean blnN    = false;
+        boolean blnNE   = false;
+        boolean blnE    = false;
+        boolean blnSE   = false;
+        boolean blnS    = false;
+        boolean blnSW   = false;
+        boolean blnW    = false;
+        boolean blnNW   = false;
+        
+        if (!strN.contains("crater") && !strN.contains("fence")) {
+            blnN = true;
+        }
+        
+        if (!strNE.contains("crater") && !strNE.contains("fence")) {
+            blnNE = true;
+        }        
+
+        if (!strE.contains("crater") && !strE.contains("fence")) {
+            blnE = true;
+        }
+
+        if (!strSE.contains("crater") && !strSE.contains("fence")) {
+            blnSE = true;
+        }        
+
+        if (!strS.contains("crater") && !strS.contains("fence")) {
+            blnS = true;
+        }        
+
+        if (!strSW.contains("crater") && !strSW.contains("fence")) {
+            blnSW = true;
+        }        
+
+        if (!strW.contains("crater") && !strW.contains("fence")) {
+            blnW = true;
+        }        
+
+        if (!strNW.contains("crater") && !strNW.contains("fence")) {
+            blnNW = true;
+        }        
+        
+        determineOptimalDistance(blnN,blnNE,blnE,blnSE,blnS,blnSW,blnW,blnNW); 
         
     }
 
+    @Override
+    public void determineOptimalDistance(boolean blnN, boolean blnNE, 
+    boolean blnE, boolean blnSE, boolean blnS, boolean blnSW, boolean blnW, 
+    boolean blnNW) {
+        int intCurrentDistance = 0;
+        int intMaxDistance = 0;
+        String strChosenDirection = "";
+        
+        if (blnN) {
+            intCurrentDistance = calculateMaxDistance("N");
+            intMaxDistance = intCurrentDistance;
+            strChosenDirection = "N";
+        }
+        
+        if (blnNE) {
+            intCurrentDistance = calculateMaxDistance("NE");
+            if(intCurrentDistance > intMaxDistance) {
+                intMaxDistance = intCurrentDistance;
+                strChosenDirection = "NE";
+            }
+        }
+        
+        if (blnE) {
+            intCurrentDistance = calculateMaxDistance("E");
+            if(intCurrentDistance > intMaxDistance) {
+                intMaxDistance = intCurrentDistance;
+                strChosenDirection = "E";
+            }            
+        }
+        
+        if (blnSE) {
+            intCurrentDistance = calculateMaxDistance("SE");
+            if(intCurrentDistance > intMaxDistance) {
+                intMaxDistance = intCurrentDistance;
+                strChosenDirection = "SE";
+            }            
+        }
+        
+        if (blnS) {
+            intCurrentDistance = calculateMaxDistance("S");
+            if(intCurrentDistance > intMaxDistance) {
+                intMaxDistance = intCurrentDistance;
+                strChosenDirection = "S";
+            }            
+        }
+        
+        if (blnSW) {
+            intCurrentDistance = calculateMaxDistance("SW");
+            if(intCurrentDistance > intMaxDistance) {
+                intMaxDistance = intCurrentDistance;
+                strChosenDirection = "SW";
+            }            
+        }
+        
+        if (blnW) {
+            intCurrentDistance = calculateMaxDistance("W");
+            if(intCurrentDistance > intMaxDistance) {
+                intMaxDistance = intCurrentDistance;
+                strChosenDirection = "W";
+            }            
+        }
+        
+        if (blnNW) {
+            intCurrentDistance = calculateMaxDistance("NW");
+            if(intCurrentDistance > intMaxDistance) {
+                intMaxDistance = intCurrentDistance;
+                strChosenDirection = "NW";
+            }            
+        }
+        
+        moveMe(strChosenDirection,intMaxDistance);
+    }
+    
+    @Override
+    public int calculateMaxDistance(String strDirection) {
+        int intDistance = 0;
+        int intMX = 0;  // Current Mower X location
+        int intMY = 0;  // Current Mower Y location
+        int intStepX = 0;
+        int intStepY = 0;
+
+        intMX = mower.getIntX();
+        intMY = mower.getIntY();
+        intStepX = intMX;
+        intStepY = intMY;
+            
+        switch(strDirection) {
+
+            case "N":
+                // X = 0; Y = -1
+                do{
+                    intStepY --;
+                    intDistance++;
+                }while(!lawn.whatsOnTheLawn(intStepX, intStepY).contains("fence"));
+                intDistance--;
+                break;
+
+            case "NE":
+                // X = +1; Y = -1
+                do{
+                    intStepY --;
+                    intStepX ++;
+                    intDistance++;
+                }while(!lawn.whatsOnTheLawn(intStepX, intStepY).contains("fence"));
+                intDistance--;
+                break;
+
+            case "E":
+                // X = +1; Y = 0
+                do{
+                    intStepX ++;
+                    intDistance++;
+                }while(!lawn.whatsOnTheLawn(intStepX, intStepY).contains("fence"));
+                intDistance--;
+                break;                
+
+            case "SE":
+                // X = +1; Y = +1
+                do{
+                    intStepY ++;
+                    intStepX ++;
+                    intDistance++;
+                }while(!lawn.whatsOnTheLawn(intStepX, intStepY).contains("fence"));
+                intDistance--;
+                break;       
+
+            case "S":
+                // X = 0; Y = +1
+                do{
+                    intStepY ++;
+                    intDistance++;
+                }while(!lawn.whatsOnTheLawn(intStepX, intStepY).contains("fence"));
+                intDistance--;
+                break;                
+
+            case "SW":
+                // X = -1; Y = +1
+                do{
+                    intStepY ++;
+                    intStepX --;
+                    intDistance++;
+                }while(!lawn.whatsOnTheLawn(intStepX, intStepY).contains("fence"));
+                intDistance--;
+                break;          
+
+            case "W":
+                // X = -1; Y = 0
+                do{
+                    intStepX --;
+                    intDistance++;
+                }while(!lawn.whatsOnTheLawn(intStepX, intStepY).contains("fence"));
+                intDistance--;
+                break;         
+
+            case "NW":
+                // X = -1; Y = -1
+                do{
+                    intStepY --;
+                    intStepX --;
+                    intDistance++;
+                }while(!lawn.whatsOnTheLawn(intStepX, intStepY).contains("fence"));
+                intDistance--;
+                break;                
+        }
+        
+        return intDistance;
+    }
+
+    // After determining the direction and the no. of steps
+    // This one will move the mower and determine if it crashed or not
+    // Change status of the lawn to empty
+    @Override
+    public String moveMe(String strFinalDestination, int intSteps) {
+        String strMowerStatus = "";
+                
+        return strMowerStatus;
+    }
+    
     private static void endGame() {
         // Print output
         System.exit(0);
