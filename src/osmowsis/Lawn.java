@@ -48,7 +48,7 @@ public class Lawn {
         for (int i = 1; i < intLawnWidth-1; i++) {
             for (int j = 1; j < intLawnHeight-1; j++) {
                 try {
-                    if (strLawn[i][j].contains("") || strLawn[i][j].isEmpty()) {
+                    if (strLawn[i][j].isEmpty()) {
                         strLawn[i][j] = "grass";
                     }
                 } catch (Exception e) { // Null Pointer Exception

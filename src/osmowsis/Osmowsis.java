@@ -14,8 +14,10 @@ import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Osmowsis {
+public class Osmowsis extends Move{
     // VARIABLES //
+    private static int intMovesCount;
+    private static int intScanCount;
     private static ArrayList<String> strInstructions = new ArrayList();
     private static Lawn lawn;
     private static Mower mower;
@@ -28,12 +30,37 @@ public class Osmowsis {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        // Inform user about the program
+        System.out.println("*** CS 6310 - Software Architecture & Design ***");
+        System.out.println("------------------------------------------------");
+        System.out.println("");
+        System.out.println("Objective: To design and implement lawn mower program");
+        System.out.println("Author: Sidhartha Chakravarty");
+        System.out.println("------------------------------------------------");
+        System.out.println("");
+        System.out.println("Instructions: ");
+        System.out.println(" 1. The program will present a list of CSV files that are stored in the current directory.");
+        System.out.println(" 2. Select the file, by entering the number next to the file name. ");
+        System.out.println(" 3. By design, the program adds extra rows and columns to indicate a fence.");
+        System.out.println(" 4. For instance, if the input file provides the dimensions - 4 x 4, the program will create a 6 x 6 grid, with fence all over");
+        System.out.println("");
+        System.out.println("------------------------------------------------");        
+        System.out.println("");
+        System.out.println("");        
+        
         // Look up contents of current folder
         lookupFiles();
         addDecorations("Mower");
         addDecorations("Crater");
         lawn.addGrass();
         printLawn(lawn.getIntLawnWidth(), lawn.getIntLawnHeight());
+        
+        // Initial Scan
+        scanSurroundings(mower.getIntX(), mower.getIntY());
+        // Play Game
+        intMovesCount = 0;
+        intScanCount = 0;
+        playGame();
     }
     
     /**
@@ -144,14 +171,21 @@ public class Osmowsis {
      * @param intLawnHeight
      * @param intLawnWidth 
      */
-    private static void printLawn(int intLawnHeight, int intLawnWidth) {
-        
+    private static void printLawn(int intLawnWidth, int intLawnHeight) {
+        String strLastDecoration = "";
         for (int intH = 0; intH < intLawnHeight; intH++) {
             for (int intW = 0; intW < intLawnWidth; intW++) {
-                System.out.print(" | ");
-                System.out.print(lawn.whatsOnTheLawn(intW, intH));
+                if(strLastDecoration.contains("crater")) {
+                    System.out.print("  |   ");                                        
+                } else {
+                    System.out.print("   |   ");                    
+                }
+
+                strLastDecoration = lawn.whatsOnTheLawn(intW, intH);
+                System.out.print(strLastDecoration);
+                
             }
-            System.out.println("|");
+            System.out.println("   |");
         }
     }
 
@@ -199,7 +233,7 @@ public class Osmowsis {
                         //System.out.println("Crater: " + strInstructions.get(i+5));
                         intCraterX = CraterXY (strInstructions.get(i+5), "X");
                         intCraterY = CraterXY (strInstructions.get(i+5), "Y");
-                        lawn.addCrater(intCraterX, intCraterY);
+                        lawn.addCrater(intCraterX + 1, intCraterY + 1);
                     }                    
                 }
                 break;
@@ -259,4 +293,56 @@ public class Osmowsis {
         strTemp = strTemp.substring(start);
         return strTemp;
     }
+    
+    private static void scanSurroundings(int intMowerX, int intMowerY) {
+        String strNeighbors = "";
+        /*
+            NORTH, NORTH-EAST, EAST, SOUTH-EAST, SOUTH, SOUTH-WEST, WEST, NORTH-WEST
+        */
+        
+        // NORTH
+        strNeighbors = "[N]: " + lawn.whatsOnTheLawn(intMowerX, intMowerY - 1);
+        // NORTH-EAST
+        strNeighbors = strNeighbors + " [NE]: " + lawn.whatsOnTheLawn(intMowerX + 1, intMowerY - 1);        
+        // EAST
+        strNeighbors = strNeighbors + " [E]: " + lawn.whatsOnTheLawn(intMowerX + 1, intMowerY);        
+        // SOUTH-EAST
+        strNeighbors = strNeighbors + " [SE]: " + lawn.whatsOnTheLawn(intMowerX + 1, intMowerY + 1);        
+        // SOUTH
+        strNeighbors = strNeighbors + " [S]: " + lawn.whatsOnTheLawn(intMowerX, intMowerY + 1);        
+        // SOUTH-WEST
+        strNeighbors = strNeighbors + " [SW]: " + lawn.whatsOnTheLawn(intMowerX - 1, intMowerY + 1);        
+        // WEST
+        strNeighbors = strNeighbors + " [W]: " + lawn.whatsOnTheLawn(intMowerX - 1, intMowerY);        
+        // NORTH-WEST
+        strNeighbors = strNeighbors + " [NW]: " + lawn.whatsOnTheLawn(intMowerX - 1, intMowerY - 1);    
+        printActionNotification("Scan");
+        System.out.println("Neighbors: " + strNeighbors);
+    }
+    
+    private static void printActionNotification(String strAction) {
+        System.out.println("");
+        System.out.println("Action: " + strAction);
+        System.out.println("------------");        
+    } 
+    
+    private static void playGame() {
+        intScanCount++;
+        do {
+            
+        } while(mower.getStatus().contains("Active"));
+        
+        endGame();
+    }
+
+    @Override
+    public void determineDirection() {
+        
+    }
+
+    private static void endGame() {
+        // Print output
+        System.exit(0);
+    }
+    
 }
