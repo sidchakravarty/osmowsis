@@ -11,11 +11,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.InputMismatchException;
+import java.util.Map;
 import java.util.Scanner;
 
-public class Osmowsis extends Move{
+public class Osmowsis {
     // VARIABLES //
+    private static Map<String, String> mower_surroundings = new HashMap<String, String>();
     private static int intMovesCount;
     private static int intScanCount;
     private static ArrayList<String> strInstructions = new ArrayList();
@@ -296,26 +299,43 @@ public class Osmowsis extends Move{
     
     private static void scanSurroundings(int intMowerX, int intMowerY) {
         String strNeighbors = "";
+        String strDecoration = "";
         /*
             NORTH, NORTH-EAST, EAST, SOUTH-EAST, SOUTH, SOUTH-WEST, WEST, NORTH-WEST
         */
         
         // NORTH
-        strNeighbors = "[N]: " + lawn.whatsOnTheLawn(intMowerX, intMowerY - 1);
+        strDecoration = lawn.whatsOnTheLawn(intMowerX, intMowerY - 1);
+        strNeighbors = "[N]: " + strDecoration;
+        mower_surroundings.put("N", strDecoration);
         // NORTH-EAST
-        strNeighbors = strNeighbors + " [NE]: " + lawn.whatsOnTheLawn(intMowerX + 1, intMowerY - 1);        
+        strDecoration = lawn.whatsOnTheLawn(intMowerX + 1, intMowerY - 1);
+        strNeighbors = strNeighbors + " [NE]: " + strDecoration;   
+        mower_surroundings.put("NE", strDecoration);
         // EAST
-        strNeighbors = strNeighbors + " [E]: " + lawn.whatsOnTheLawn(intMowerX + 1, intMowerY);        
+        strDecoration = lawn.whatsOnTheLawn(intMowerX + 1, intMowerY);
+        strNeighbors = strNeighbors + " [E]: " + strDecoration;   
+        mower_surroundings.put("E", strDecoration);
         // SOUTH-EAST
-        strNeighbors = strNeighbors + " [SE]: " + lawn.whatsOnTheLawn(intMowerX + 1, intMowerY + 1);        
+        strDecoration = lawn.whatsOnTheLawn(intMowerX + 1, intMowerY + 1);
+        strNeighbors = strNeighbors + " [SE]: " + strDecoration;        
+        mower_surroundings.put("SE", strDecoration);
         // SOUTH
-        strNeighbors = strNeighbors + " [S]: " + lawn.whatsOnTheLawn(intMowerX, intMowerY + 1);        
+        strDecoration = lawn.whatsOnTheLawn(intMowerX, intMowerY + 1);
+        strNeighbors = strNeighbors + " [S]: " + strDecoration;   
+        mower_surroundings.put("S", strDecoration);
         // SOUTH-WEST
-        strNeighbors = strNeighbors + " [SW]: " + lawn.whatsOnTheLawn(intMowerX - 1, intMowerY + 1);        
+        strDecoration = lawn.whatsOnTheLawn(intMowerX - 1, intMowerY + 1);
+        strNeighbors = strNeighbors + " [SW]: " + strDecoration;      
+        mower_surroundings.put("SW", strDecoration);
         // WEST
-        strNeighbors = strNeighbors + " [W]: " + lawn.whatsOnTheLawn(intMowerX - 1, intMowerY);        
+        strDecoration = lawn.whatsOnTheLawn(intMowerX - 1, intMowerY);
+        strNeighbors = strNeighbors + " [W]: " + strDecoration;   
+        mower_surroundings.put("W", strDecoration);
         // NORTH-WEST
-        strNeighbors = strNeighbors + " [NW]: " + lawn.whatsOnTheLawn(intMowerX - 1, intMowerY - 1);    
+        strDecoration = lawn.whatsOnTheLawn(intMowerX - 1, intMowerY - 1);
+        strNeighbors = strNeighbors + " [NW]: " + strDecoration;   
+        mower_surroundings.put("NW", strDecoration);
         printActionNotification("Scan");
         System.out.println("Neighbors: " + strNeighbors);
     }
@@ -326,17 +346,33 @@ public class Osmowsis extends Move{
         System.out.println("------------");        
     } 
     
+    /**
+     * GamePlay:
+     * 1. While mover status = "Active"
+     * 2. For current position of the mower,
+     *    determine the viable directions in which the mower can travel
+     * 4. For those directions, determine the maximum distance the mower
+     *    can travel
+     * 5. Choose the direction that maximizes the distance
+     * 6. Travel on the intended path for the intended direction
+     * 7. While traveling, determine if you encountered a crater <CRASH>
+     * 8. If mower has reached a boundary, scan again.
+     * 9. Game continues till the mower has crashed or all grass has been cut
+     */
     private static void playGame() {
         intScanCount++;
         do {
-            
+            determineAvailableDirection(mower_surroundings.get("N"),
+            mower_surroundings.get("NE"),mower_surroundings.get("E"),
+            mower_surroundings.get("SE"),mower_surroundings.get("S"),
+            mower_surroundings.get("SW"),mower_surroundings.get("W"),
+            mower_surroundings.get("NW"));
         } while(mower.getStatus().contains("Active"));
         
         endGame();
     }
 
-    @Override
-    public void determineAvailableDirection(String strN, String strNE, String strE, 
+    private static void determineAvailableDirection(String strN, String strNE, String strE, 
     String strSE, String strS, String strSW, String strW, String strNW) {
         boolean blnN    = false;
         boolean blnNE   = false;
@@ -383,8 +419,7 @@ public class Osmowsis extends Move{
         
     }
 
-    @Override
-    public void determineOptimalDistance(boolean blnN, boolean blnNE, 
+    private static void determineOptimalDistance(boolean blnN, boolean blnNE, 
     boolean blnE, boolean blnSE, boolean blnS, boolean blnSW, boolean blnW, 
     boolean blnNW) {
         int intCurrentDistance = 0;
@@ -456,8 +491,7 @@ public class Osmowsis extends Move{
         moveMe(strChosenDirection,intMaxDistance);
     }
     
-    @Override
-    public int calculateMaxDistance(String strDirection) {
+    private static int calculateMaxDistance(String strDirection) {
         int intDistance = 0;
         int intMX = 0;  // Current Mower X location
         int intMY = 0;  // Current Mower Y location
@@ -554,8 +588,7 @@ public class Osmowsis extends Move{
     // After determining the direction and the no. of steps
     // This one will move the mower and determine if it crashed or not
     // Change status of the lawn to empty
-    @Override
-    public String moveMe(String strFinalDestination, int intSteps) {
+    private static String moveMe(String strFinalDestination, int intSteps) {
         String strMowerStatus = "";
                 
         return strMowerStatus;
