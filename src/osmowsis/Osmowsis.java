@@ -675,6 +675,12 @@ public class Osmowsis {
     private static void endGame(int intLawnSquares, int intMoves, int intOriginalGrass, int intCutGrass) {
         // Print output
         printActionNotification("End Game");
+        System.out.println("Final Lawn Output");
+        System.out.println("-----------------");
+        printLawn(lawn.getIntLawnWidth(), lawn.getIntLawnHeight());
+        System.out.println("-----------------");
+        System.out.println("");
+        System.out.println("");
         System.out.println("Lawn Squares    : " + intLawnSquares);
         System.out.println("Initial Grass   : " + intOriginalGrass);
         System.out.println("Cut Grass       : " + intCutGrass);
