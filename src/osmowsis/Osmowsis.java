@@ -55,7 +55,7 @@ public class Osmowsis {
         System.out.println("");        
         
         // Look up contents of current folder
-        if(args[0].isEmpty()) {
+        if(args.length == 0) {
             lookupFiles("None");            
         } else {
             lookupFiles(args[0]);
