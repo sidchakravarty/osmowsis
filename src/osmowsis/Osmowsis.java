@@ -8,6 +8,7 @@ package osmowsis;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +55,12 @@ public class Osmowsis {
         System.out.println("");        
         
         // Look up contents of current folder
-        lookupFiles();
+        if(args[0].isEmpty()) {
+            lookupFiles("None");            
+        } else {
+            lookupFiles(args[0]);
+        }
+
         addDecorations("Mower");
         addDecorations("Crater");
         lawn.addGrass();
@@ -71,50 +77,73 @@ public class Osmowsis {
     /**
      * Objective: Scan current folder and list all CSV files
      */
-    private static void lookupFiles() {
-        Scanner input = new Scanner(System.in);
-        ArrayList strFilePaths = new ArrayList();        
-        boolean blnCorrectFileNumber = false;
-        int intFile = 1;
-        File curDir = new File(System.getProperty("user.dir"));
-        File[] fileList = curDir.listFiles();
-        System.out.println("Please select the input file by entering the number below");
-        System.out.println("Current Directory: " + curDir.getPath());
-        for(File f : fileList) {
-            if(f.isFile() && f.getName().contains(".csv")) {
-                System.out.println("File " + intFile + ": " + f.getName());
-                String strFilePath = curDir.getPath() + "\\" + f.getName();
-                strFilePaths.add(strFilePath);
-                intFile++;
-            }
-        }
-        intFile--;
-        System.out.println("");
-        System.out.println("Total CSV Files Found - " + intFile);
-        
-        if(intFile == 0) {
-            System.err.println("No CSV files were found. Exiting program.");
-            System.exit(0);
-        } else {
-            do {
-                try {
-                    System.out.print("Please enter the file number that you would like to open: ");                    
-                    int fileNumberSelected = input.nextInt();
-                    if (fileNumberSelected < 1 || fileNumberSelected > intFile) {
-                        System.out.println("");
-                        System.err.println("Please select a valid file number. You can choose between 1 and " + intFile + ".");
-                        input.nextLine();
-                    } else {
-                        blnCorrectFileNumber = true;
-                        System.out.println("Congratulations! You won an ice-cream treat!");
-                        openCSVFile(strFilePaths.get(fileNumberSelected - 1).toString());
-                    }
-                } catch (InputMismatchException ime) {
-                    System.err.println("Please enter a valid file number between 1 and " + intFile);
-                    blnCorrectFileNumber = false;
-                    input.nextLine();
+    private static void lookupFiles(String strFileName) {
+        if(strFileName.contains("None")){
+            Scanner input = new Scanner(System.in);
+            ArrayList strFilePaths = new ArrayList();        
+            boolean blnCorrectFileNumber = false;
+            int intFile = 1;
+            File curDir = new File(System.getProperty("user.dir"));
+            File[] fileList = curDir.listFiles();
+            System.out.println("Please select the input file by entering the number below");
+            System.out.println("Current Directory: " + curDir.getPath());
+            for(File f : fileList) {
+                if(f.isFile() && f.getName().contains(".csv")) {
+                    System.out.println("File " + intFile + ": " + f.getName());
+                    String strFilePath = curDir.getPath() + "\\" + f.getName();
+                    strFilePaths.add(strFilePath);
+                    intFile++;
                 }
-            } while (blnCorrectFileNumber == false);
+            }
+            intFile--;
+            System.out.println("");
+            System.out.println("Total CSV Files Found - " + intFile);
+
+            if(intFile == 0) {
+                System.err.println("No CSV files were found. Exiting program.");
+                System.exit(0);
+            } else {
+                do {
+                    try {
+                        System.out.print("Please enter the file number that you would like to open: ");                    
+                        int fileNumberSelected = input.nextInt();
+                        if (fileNumberSelected < 1 || fileNumberSelected > intFile) {
+                            System.out.println("");
+                            System.err.println("Please select a valid file number. You can choose between 1 and " + intFile + ".");
+                            input.nextLine();
+                        } else {
+                            blnCorrectFileNumber = true;
+                            System.out.println("Congratulations! You won an ice-cream treat!");
+                            openCSVFile(strFilePaths.get(fileNumberSelected - 1).toString());
+                        }
+                    } catch (InputMismatchException ime) {
+                        System.err.println("Please enter a valid file number between 1 and " + intFile);
+                        blnCorrectFileNumber = false;
+                        input.nextLine();
+                    }
+                } while (blnCorrectFileNumber == false);
+            }            
+        } else {
+            // Check for correct file name / file exists ...
+            
+            File curDir = new File(System.getProperty("user.dir"));
+            String strFilePath = curDir.getPath() + "\\" + strFileName;            
+
+            try {
+                File file = new File(strFilePath);
+                boolean fileExists = file.exists();
+                if(fileExists) {
+                    openCSVFile(strFilePath);                    
+                } else {
+                    throw new FileNotFoundException();
+                }
+
+            } catch (Exception e) {
+                System.err.println("Error opening file: " + strFileName);
+                System.err.println("Error: " + e.getMessage());
+                System.err.println("Exiting Program");
+                System.exit(0);
+            }
         }
     }
     
