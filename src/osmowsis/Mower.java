@@ -36,6 +36,7 @@ public class Mower {
     public void setIntY(int intY) {this.intY = intY;}
     public void setStatus(String status) {this.status = status;}
     public void setStrDirection(String strDirection) {this.strDirection = strDirection;}
+    public void setTurns(int intTurns) {this.noOfTurns = intTurns;}
     
     // Getters
     public int getIntX() {return intX;}

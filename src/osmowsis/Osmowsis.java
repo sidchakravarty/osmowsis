@@ -24,6 +24,8 @@ public class Osmowsis {
     private static ArrayList<String> strInstructions = new ArrayList();
     private static Lawn lawn;
     private static Mower mower;
+    private static int intTurns = 0;
+    private static int intMaxTurns = 0;
     /**
      * ALGORITHM:
      * 1. Read CSV file stored in current directory
@@ -153,6 +155,8 @@ public class Osmowsis {
         try {
             intLawnHeight = Integer.parseInt(retrieveDimension(strInstructions.get(1)));
             intLawnWidth = Integer.parseInt(retrieveDimension(strInstructions.get(0)));
+            intMaxTurns = Integer.parseInt(retrieveTurns(strInstructions.get(strInstructions.size()-1)));
+            
         } catch (NumberFormatException nfe) {
             System.err.println("Invalid Parameters found: " + nfe.getMessage());
         }
@@ -191,7 +195,17 @@ public class Osmowsis {
             System.out.println("   |");
         }
     }
-
+    
+    private static String retrieveTurns(String strValue) {
+        String strTemp;
+            strTemp = strValue.trim();
+            strTemp = strTemp.substring(1);
+            strTemp = strTemp.substring(0, strTemp.length() - 1);
+            strTemp = String.valueOf(strTemp);
+            System.out.println(strTemp);
+        return strTemp;
+    }
+    
     /**
      * OBJECTIVE: This method retrieves the lawn dimensions
      * Original value - [x]
@@ -362,12 +376,13 @@ public class Osmowsis {
     private static void playGame() {
         intScanCount++;
         do {
+            intTurns++;
             determineAvailableDirection(mower_surroundings.get("N"),
             mower_surroundings.get("NE"),mower_surroundings.get("E"),
             mower_surroundings.get("SE"),mower_surroundings.get("S"),
             mower_surroundings.get("SW"),mower_surroundings.get("W"),
             mower_surroundings.get("NW"));
-        } while(mower.getStatus().contains("active"));
+        } while(mower.getStatus().contains("active") || intTurns < intMaxTurns);
     }
 
     private static void determineAvailableDirection(String strN, String strNE, String strE, 
@@ -385,34 +400,39 @@ public class Osmowsis {
             blnN = true;
         }
         
-        if (!strNE.contains("crater") && !strNE.contains("fence") && !strN.contains("empty")) {
+        if (!strNE.contains("crater") && !strNE.contains("fence") && !strNE.contains("empty")) {
             blnNE = true;
         }        
 
-        if (!strE.contains("crater") && !strE.contains("fence") && !strN.contains("empty")) {
+        if (!strE.contains("crater") && !strE.contains("fence") && !strE.contains("empty")) {
             blnE = true;
         }
 
-        if (!strSE.contains("crater") && !strSE.contains("fence") && !strN.contains("empty")) {
+        if (!strSE.contains("crater") && !strSE.contains("fence") && !strSE.contains("empty")) {
             blnSE = true;
         }        
 
-        if (!strS.contains("crater") && !strS.contains("fence") && !strN.contains("empty")) {
+        if (!strS.contains("crater") && !strS.contains("fence") && !strS.contains("empty")) {
             blnS = true;
         }        
 
-        if (!strSW.contains("crater") && !strSW.contains("fence") && !strN.contains("empty")) {
+        if (!strSW.contains("crater") && !strSW.contains("fence") && !strSW.contains("empty")) {
             blnSW = true;
         }        
 
-        if (!strW.contains("crater") && !strW.contains("fence") && !strN.contains("empty")) {
+        if (!strW.contains("crater") && !strW.contains("fence") && !strW.contains("empty")) {
             blnW = true;
         }        
 
-        if (!strNW.contains("crater") && !strNW.contains("fence") && !strN.contains("empty")) {
+        if (!strNW.contains("crater") && !strNW.contains("fence") && !strNW.contains("empty")) {
             blnNW = true;
         }        
         
+        if(!blnN && !blnNE && !blnE && !blnSE && !blnS && !blnSW && !blnW && !blnNW) {
+            printActionNotification("Game End - No. of Turns");
+            int intLawnSquares = (lawn.getIntLawnHeight() - 2)* (lawn.getIntLawnWidth() - 2);
+            endGame(intLawnSquares,mower.getnoOfTurns(), lawn.getOriginalGrass(), lawn.getCutGrass());
+        }
         determineOptimalDistance(blnN,blnNE,blnE,blnSE,blnS,blnSW,blnW,blnNW); 
         
     }
@@ -591,7 +611,7 @@ public class Osmowsis {
             intStepY = intMY;
             mower.setStrDirection(strFinalDestination);
 
-            for(int i = 0; i <= intSteps; i++) {
+            for(int i = 0; i < intSteps; i++) {
                 switch(strFinalDestination) {
                     case "N":
                             intStepY--;
@@ -625,11 +645,13 @@ public class Osmowsis {
                 intMovesCount++;
                 if(lawn.whatsOnTheLawn(intStepX, intStepY).contains("crater")) {
                     strMowerStatus = "crash";
-                    int intLawnSquares = lawn.getIntLawnHeight() * lawn.getIntLawnWidth();
+                    
                     printActionNotification("Crash");
                     System.out.println("[Turns]: " + intMovesCount + " [Direction]: " + strFinalDestination);
-                    System.out.println("Crash");                    
-                    endGame(intLawnSquares,intMovesCount, lawn.getOriginalGrass(), lawn.getCutGrass());
+                    System.out.println("Crash");   
+                    mower.setTurns(intMovesCount);
+                    int intLawnSquares = (lawn.getIntLawnHeight() - 2)* (lawn.getIntLawnWidth() - 2);
+                    endGame(intLawnSquares,mower.getnoOfTurns(), lawn.getOriginalGrass(), lawn.getCutGrass());
                 } else {
                     strMowerStatus = "active";
                     mower.setIntX(intStepX);
@@ -646,16 +668,17 @@ public class Osmowsis {
             }
             
         printLawn(lawn.getIntLawnWidth(), lawn.getIntLawnHeight());
+        scanSurroundings(intMX,intMY); // Updates Mower Surroundings
         return strMowerStatus;
     }
     
     private static void endGame(int intLawnSquares, int intMoves, int intOriginalGrass, int intCutGrass) {
         // Print output
         printActionNotification("End Game");
-        System.out.println("Lawn Squares: " + intLawnSquares);
-        System.out.println("Initial Grass: " + intOriginalGrass);
-        System.out.println("Cut Grass: " + intCutGrass);
-        System.out.println("No. of moves: intMoves" + intMoves);
+        System.out.println("Lawn Squares    : " + intLawnSquares);
+        System.out.println("Initial Grass   : " + intOriginalGrass);
+        System.out.println("Cut Grass       : " + intCutGrass);
+        System.out.println("No. of moves    : " + intMoves);
         System.exit(0);
     }
     

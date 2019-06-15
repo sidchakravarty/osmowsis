@@ -76,6 +76,8 @@ public class Lawn {
             return "mower";
         } else if (strLawn[intX][intY].contains("grass")) {
             return "grass";
+        } else if (strLawn[intX][intY].contains("empty")) {
+            return "empty";
         }
         return "";
     }
