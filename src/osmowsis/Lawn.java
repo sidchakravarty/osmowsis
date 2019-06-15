@@ -10,10 +10,12 @@ package osmowsis;
  * @author Chakravarty
  */
 public class Lawn {
-    int intLawnWidth;
-    int intLawnHeight;
-    String strLawn[][];
-
+    private int intLawnWidth;
+    private int intLawnHeight;
+    private String strLawn[][];
+    private int intOriginalGrass = 0;
+    private int intGrassCut = 0;
+    
     /**
      * OBJECTIVE: Class Constructor
      *            Adds Fence to the farm
@@ -41,8 +43,8 @@ public class Lawn {
     
     private void addFence(int intX, int intY) {strLawn[intX][intY] = "fence";}
     public void addCrater(int intX, int intY){strLawn[intX][intY] = "crater";}
-    public void addMower(int intX, int intY){strLawn[intX][intY] = "mower";}    
-    public void cutGrass(int intX, int intY) {strLawn[intX][intY] = "empty";}
+    public void moveMower(int intX, int intY){strLawn[intX][intY] = "mower";}    
+    public void cutGrass(int intX, int intY) {strLawn[intX][intY] = "empty";intGrassCut++;}
     
     public void addGrass() {
         for (int i = 1; i < intLawnWidth-1; i++) {
@@ -50,9 +52,11 @@ public class Lawn {
                 try {
                     if (strLawn[i][j].isEmpty()) {
                         strLawn[i][j] = "grass";
+                        intOriginalGrass++;
                     }
                 } catch (Exception e) { // Null Pointer Exception
-                    strLawn[i][j] = "grass";                    
+                    strLawn[i][j] = "grass";   
+                    intOriginalGrass++;
                 }
             }
         }
@@ -60,6 +64,8 @@ public class Lawn {
 
     public int getIntLawnWidth() {return intLawnWidth;}
     public int getIntLawnHeight() {return intLawnHeight;}
+    public int getOriginalGrass() {return intOriginalGrass;}
+    public int getCutGrass() {return intGrassCut;}
     
     public String whatsOnTheLawn(int intX, int intY) {
         if (strLawn[intX][intY].contains("fence")) {
