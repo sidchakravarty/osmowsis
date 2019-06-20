@@ -19,8 +19,9 @@ public class Mower {
     private String nextAction;
     private String nextDirection;
     private int noOfTurns;
+    private int intMowerID;
 
-    public Mower(int intX, int intY, String status, String strDirection) {
+    public Mower(int intX, int intY, String status, String strDirection, int strMowerID) {
         this.intX = intX;
         this.intY = intY;
         this.status = "Active";
@@ -29,6 +30,7 @@ public class Mower {
         this.nextDirection = "";
         this.noOfTurns = 0;
         this.strDirection = strDirection.substring(0,strDirection.length() - 1);
+        this.intMowerID = intMowerID;
     }
 
     // Setters
@@ -44,6 +46,7 @@ public class Mower {
     public String getStatus() {return status;}
     public String getStrDirection() {return strDirection;}    
     public int getnoOfTurns() {return noOfTurns;}
+    public int getID(){return intMowerID;}
     
     public String moveMower(String strDirection, int noOfPlaces) {
         String strActionStatus = "";

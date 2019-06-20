@@ -27,6 +27,7 @@ public class Osmowsis {
     private static Mower mower;
     private static int intTurns = 0;
     private static int intMaxTurns = 0;
+    private static int intMowerCount = 0;
     /**
      * ALGORITHM:
      * 1. Read CSV file stored in current directory
@@ -268,7 +269,8 @@ public class Osmowsis {
                 intMowerX = mowerXY (strInstructions.get(3), "Width");
                 intMowerY = mowerXY (strInstructions.get(3), "Height");
                 strMowerDirection = mowerDirection (strInstructions.get(3));
-                mower = new Mower(intMowerX + 1, intMowerY + 1, "active", strMowerDirection);
+                // TODO: Add Code to read no. of mowers from file, then for each mower, instantiate the mower and assign ID 
+                mower = new Mower(intMowerX + 1, intMowerY + 1, "active", strMowerDirection, intMowerCount);
                 lawn.moveMower(intMowerX + 1, intMowerY + 1);
                 break;
                 
