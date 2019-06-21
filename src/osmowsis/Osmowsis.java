@@ -270,7 +270,7 @@ public class Osmowsis {
                 intMowerY = mowerXY (strInstructions.get(3), "Height");
                 strMowerDirection = mowerDirection (strInstructions.get(3));
                 // TODO: Add Code to read no. of mowers from file, then for each mower, instantiate the mower and assign ID 
-                mower = new Mower(intMowerX + 1, intMowerY + 1, "active", strMowerDirection, intMowerCount);
+                mower = new Mower(intMowerX + 1, intMowerY + 1, "active", strMowerDirection, intMowerCount, 100);
                 lawn.moveMower(intMowerX + 1, intMowerY + 1);
                 break;
                 
